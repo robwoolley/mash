@@ -14,27 +14,91 @@ The ROS tooling has a naming scheme based on willow trees and the OpenEmbedded t
 # Installation
 
 ```
+git clone https://github.com/robwoolley/mash.git
+cd mash
 python3 -m venv myenv
 source myenv/bin/activate
 pip install -r requirements.txt
+pip install colcon-common-extensions
 pip install .
 ```
 
 # Usage
 
-After sourcing your venv, you may use mash to generate bitbake recipes for Space ROS.
+If you already have a ROS 2 environment, you may skip to step 3.
 
-Install vcs2l to retrieve Space ROS sources with vcs.
+1. Use Docker to pull the official ROS 2 Humble container image.
+
 ```
-pip install vcs2l colcon-common-extensions
+docker run -it --rm amd64/ros:humble
+```
 
-mkdir spaceros_ws
-cd spaceros_ws
-git clone https://github.com/space-ros/space-ros
-mkdir src
-vcs import src < ./space-ros/spaceros.repos
-vcs import src < ./space-ros/ros2.repos
-mash --rosdistro humble
+2. Install the package for Python venv support:
+```
+apt update
+apt install -y python3.10-venv
+```
+
+3. Create a workspace with mash with some demonstration examples.
+
+```
+source /opt/ros/humble/setup.bash
+mkdir -p ~/ros2_ws/src
+cd ~/ros2_ws/src
+git clone https://github.com/ros/ros_tutorials.git -b humble
+git clone https://github.com/ros2/demos.git -b humble
+cd ..
+```
+
+4. Install mash with venv
+```
+git clone https://github.com/robwoolley/mash.git
+cd mash
+python3 -m venv myenv
+source myenv/bin/activate
+pip install -r requirements.txt
+pip install colcon-common-extensions
+pip install .
+cd ..
+```
+
+5. Run mash in the colcon workspace to create BitBake recipes.
+```
+mash --rosdistro $ROS_DISTRO
+```
+
+6. Find the generated bitbake recipes under build_mash:
+```
+(myenv) root@25037274df1a:~/ros2_ws# find build_mash -type f
+build_mash/action_tutorials_cpp/action-tutorials-cpp_0.20.7.bb
+build_mash/intra_process_demo/intra-process-demo_0.20.7.bb
+build_mash/demo_nodes_cpp_native/demo-nodes-cpp-native_0.20.7.bb
+build_mash/demo_nodes_py/demo-nodes-py_0.20.7.bb
+build_mash/topic_statistics_demo/topic-statistics-demo_0.20.7.bb
+build_mash/pendulum_msgs/pendulum-msgs_0.20.7.bb
+build_mash/quality_of_service_demo_cpp/quality-of-service-demo-cpp_0.20.7.bb
+build_mash/topic_monitor/topic-monitor_0.20.7.bb
+build_mash/dummy_robot_bringup/dummy-robot-bringup_0.20.7.bb
+build_mash/logging_demo/logging-demo_0.20.7.bb
+build_mash/lifecycle_py/lifecycle-py_0.20.7.bb
+build_mash/action_tutorials_py/action-tutorials-py_0.20.7.bb
+build_mash/dummy_sensors/dummy-sensors_0.20.7.bb
+build_mash/composition/composition_0.20.7.bb
+build_mash/pendulum_control/pendulum-control_0.20.7.bb
+build_mash/turtlesim/turtlesim_1.4.3.bb
+build_mash/demo_nodes_cpp/demo-nodes-cpp_0.20.7.bb
+build_mash/quality_of_service_demo_py/quality-of-service-demo-py_0.20.7.bb
+build_mash/lifecycle/lifecycle_0.20.7.bb
+build_mash/action_tutorials_interfaces/action-tutorials-interfaces_0.20.7.bb
+build_mash/dummy_map_server/dummy-map-server_0.20.7.bb
+build_mash/image_tools/image-tools_0.20.7.bb
+```
+
+6. (Optional) If mash fails to find any ROS packages, you may try building the colcon workspace to see if colcon can discover the packages.
+
+```
+rosdep install -i --from-path src --rosdistro humble -y
+colcon build
 ```
 
 # Contributing
