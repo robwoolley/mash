@@ -103,10 +103,10 @@ colcon build
 
 # Contributing
 
-Any contribution that you make to this repository will be under the [Apache 2.0 License](LICENSE-2.0.txt), unless explicitly stated otherwise.
+Any contribution that you make to this repository will be under the [Apache 2.0 License](LICENSE), unless explicitly stated otherwise.
 
 Contributors must sign-off each commit by adding a `Signed-off-by: ...` line to commit messages to certify that they have the right to submit the code they are contributing to the project according to the [Developer Certificate of Origin (DCO)](https://developercertificate.org/).
 
 # License
 
-The source code for this project is under the Apache 2.0 license.  Text for the license can be found in the LICENSE-2.0.txt file in the project top level directory.  Dependencies may be under different licenses.
+The source code for this project is under the Apache 2.0 license.  Text for the license can be found in the LICENSE file in the project top level directory.  Dependencies may be under different licenses.
