@@ -14,9 +14,9 @@ The ROS tooling has a naming scheme based on willow trees and the OpenEmbedded t
 # Installation
 
 ```
-python -m venv myenv
+python3 -m venv myenv
 source myenv/bin/activate
-pip install --break-system-packages -r requirements.txt
+pip install -r requirements.txt
 pip install .
 ```
 
@@ -34,7 +34,7 @@ git clone https://github.com/space-ros/space-ros
 mkdir src
 vcs import src < ./space-ros/spaceros.repos
 vcs import src < ./space-ros/ros2.repos
-mash --ros-distro humble
+mash --rosdistro humble
 ```
 
 # Contributing
