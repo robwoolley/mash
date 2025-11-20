@@ -26,8 +26,8 @@ from colcon_core.topological_order import topological_order_packages
 from colcon_core.verb import VerbExtensionPoint
 from git import Repo, GitCommandError
 from rosdistro import get_index, get_index_url, get_cached_distribution
-from ros_generate.BitbakeRecipe import BitbakeRecipe
-from ros_generate.PackageMetadata import PackageMetadata
+from mash.BitbakeRecipe import BitbakeRecipe
+from mash.PackageMetadata import PackageMetadata
 from urllib.parse import urlparse
 
 import os
@@ -45,9 +45,9 @@ class BitbakeVerb(VerbExtensionPoint):
     def add_arguments(self, *, parser):  # noqa: D102
         parser.add_argument(
             '--build-base',
-            default='build_ros_generate',
+            default='build_mash',
             help='The base directory for build files '
-                 '(default: build_ros_generate)'
+                 '(default: build_mash)'
         )
 
         parser.add_argument(

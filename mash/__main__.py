@@ -4,6 +4,6 @@
 
 import sys
 
-from ros_generate.command import main
+from mash.command import main
 
 sys.exit(main())

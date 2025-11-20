@@ -11,27 +11,27 @@ from colcon_core.command \
 from colcon_core.command import main as colcon_main
 from colcon_core.environment_variable import EnvironmentVariable
 
-from ros_generate.verb.bitbake import BitbakeVerb
+from mash.verb.bitbake import BitbakeVerb
 
 """Environment variable to set the log level"""
 LOG_LEVEL_ENVIRONMENT_VARIABLE = EnvironmentVariable(
-    'ROS_GENERATE_LOG_LEVEL',
+    'MASH_LOG_LEVEL',
     COLCON_LOG_LEVEL_ENVIRONMENT_VARIABLE.description)
 
 """Environment variable to set the configuration directory"""
 HOME_ENVIRONMENT_VARIABLE = EnvironmentVariable(
-    'ROS_GENERATE_HOME',
-    'Set the configuration directory (default: ~/.ros_generate)')
+    'MASH_HOME',
+    'Set the configuration directory (default: ~/.mash)')
 
 
 def main(*args: str, **kwargs: str) -> Any:
     """Execute the main logic of the command."""
 
     colcon_kwargs = {
-        'command_name': 'ros-generate',
-        'verb_group_name': 'ros_generate.verb',
+        'command_name': 'mash',
+        'verb_group_name': 'mash.verb',
         'environment_variable_group_name':
-            'ros_generate.environment_variable',
+            'mash.environment_variable',
         'default_verb': BitbakeVerb,
         'default_log_base': os.devnull,
         **kwargs,

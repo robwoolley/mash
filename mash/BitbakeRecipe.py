@@ -13,14 +13,14 @@
 # limitations under the License.
 
 import os.path
-from ros_generate.SPDXLicense import is_spdx_license, map_license
-from ros_generate.rosdep_support import resolve_rosdep_key
+from mash.SPDXLicense import is_spdx_license, map_license
+from mash.rosdep_support import resolve_rosdep_key
 
 ROS_DISTRO_DEFAULT = "rolling"
 
 class BitbakeRecipe:
     recipe_boilerplate = "\
-# Recipe created by ros-generate\n\
+# Recipe created by mash\n\
 #\n\
 # Copyright (c) 2025 Open Source Robotics Foundation, Inc.\n\
 "
@@ -199,7 +199,7 @@ RDEPENDS:${PN} += \"${ROS_EXEC_DEPENDS}\"\n\
         lines = []
         lines.append(self.recipe_boilerplate)
         lines.append(f"inherit ros_distro_{self.rosdistro}")
-        lines.append(f"inherit ros_generate_generated")
+        lines.append(f"inherit mash_generated")
         lines.append("")
 
         if self.summary:
