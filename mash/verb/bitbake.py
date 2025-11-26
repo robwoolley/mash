@@ -15,6 +15,7 @@
 # limitations under the License.
 
 import logging
+import re
 
 from colcon_core.logging import colcon_logger
 from colcon_core.logging import get_effective_console_level
@@ -59,9 +60,38 @@ class BitbakeVerb(VerbExtensionPoint):
         add_packages_arguments(parser)
 
 
+    def is_scp_url_format(self, url: str) -> bool:
+       """
+       Determine if the Git remote URL is in SCP format
+       https://www.rfc-editor.org/rfc/rfc3986
+
+       This is a simplified regex to check for the non-standard
+       user@host:/path format. It accepts with and without a username.
+
+       If a scheme (ie. protocol) is found then return false
+       """
+       if re.match(r'^[A-Za-z0-9]+://', url):
+           return False
+
+       return bool(re.match(r'^([^@/:]+@)?[^@/:]+:.*$', url))
+
     def format_src_uri(self, uri):  # noqa: D102
+        if uri.startswith('/') and not uri.startswith('//'):
+            uri = 'file://' + url
+
+
+        if self.is_scp_url_format(uri):
+            user_host, path = uri.split(":", 1)
+            if not path.startswith('/'):
+                path = '/' + path
+            uri = f"ssh://{user_host}{path}"
+
         p = urlparse(uri)
-        return f"git://{p.netloc}{p.path};${{ROS_BRANCH}};protocol={p.scheme}"
+        if p.username:
+            protocol = "ssh"
+        else:
+            protocol = p.scheme
+        return f"git://{p.netloc}{p.path};${{ROS_BRANCH}};protocol={protocol}"
 
     def list_packages(self, distro_name):
         index_url = get_index_url()
