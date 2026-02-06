@@ -140,8 +140,10 @@ class BitbakeVerb(VerbExtensionPoint):
             self.path = os.path.abspath(
                 os.path.join(os.getcwd(), str(pkg.path)))
 
-            self.build_base = os.path.abspath(os.path.join(
-                os.getcwd(), args.build_base, pkg.name))
+            recipe_name = pkg.name.lower().replace('_', '-')
+
+            recipe_dir = os.path.abspath(os.path.join(
+                os.getcwd(), args.build_base, recipe_name))
 
             package_manifest_path = os.path.join(pkg.path, self.ros_package_manifest)
             if os.path.exists(package_manifest_path):
@@ -221,10 +223,10 @@ class BitbakeVerb(VerbExtensionPoint):
                     bitbake_recipe.set_git_metadata(src_uri, branch, src_rev, repo_name, tag_name)
 
 
-                ros_bitbake_recipe = os.path.join(self.build_base, bitbake_recipe.bitbake_recipe_filename())
+                ros_bitbake_recipe = os.path.join(recipe_dir, bitbake_recipe.bitbake_recipe_filename())
                 lines.append(f"\t- Bitbake recipe: {ros_bitbake_recipe}")
 
-                os.makedirs(self.build_base, exist_ok=True)
+                os.makedirs(recipe_dir, exist_ok=True)
 
                 with open(ros_bitbake_recipe, 'w') as h:
                     h.write(bitbake_recipe.get_recipe_text())
