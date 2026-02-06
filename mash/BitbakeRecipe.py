@@ -250,15 +250,9 @@ RDEPENDS:${PN} += \"${ROS_EXEC_DEPENDS}\"\n\
         lines.append(f'ROS_BRANCH ?= "branch={self.branch}"')
         lines.append(f'SRC_URI = "{self.src_uri}"')
         lines.append(f'SRCREV = "{self.srcrev}"')
+
         # XXX: Only use WORKDIR for older Yocto releases like scarthgap
-
-        split_path = self.pkg_path.split(os.path.sep)
-        if len(split_path) > 2:
-            git_subdir = os.path.sep + os.path.join(*split_path[2:])
-        else:
-            git_subdir = ""
-
-        lines.append(f'S = "${{WORKDIR}}/git{git_subdir}"')
+        lines.append(f'S = "${{WORKDIR}}/git{self.pkg_path}"')
 
         lines.append("")
         lines.append(f"ROS_BUILD_TYPE = \"{self.build_type}\"")

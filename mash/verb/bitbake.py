@@ -26,6 +26,7 @@ from colcon_core.plugin_system import satisfies_version
 from colcon_core.topological_order import topological_order_packages
 from colcon_core.verb import VerbExtensionPoint
 from git import Repo, GitCommandError
+from pathlib import Path
 from rosdistro import get_index, get_index_url, get_cached_distribution
 from mash.BitbakeRecipe import BitbakeRecipe
 from mash.PackageMetadata import PackageMetadata
@@ -137,9 +138,6 @@ class BitbakeVerb(VerbExtensionPoint):
 
             lines.append(f"{pkg.name:<30}\t{str(pkg.path):<30}\t({pkg.type})")
 
-            self.path = os.path.abspath(
-                os.path.join(os.getcwd(), str(pkg.path)))
-
             recipe_name = pkg.name.lower().replace('_', '-')
 
             recipe_dir = os.path.abspath(os.path.join(
@@ -156,12 +154,11 @@ class BitbakeVerb(VerbExtensionPoint):
                 bitbake_recipe.set_rosdistro(args.rosdistro)
                 bitbake_recipe.set_internal_packages(released_packages)
                 bitbake_recipe.importPackage(pkg_metadata)
-                bitbake_recipe.set_pkg_path(str(pkg.path))
 
                 repo = None
                 # Get source URI and revision
                 try:
-                    repo = Repo(pkg.path, search_parent_directories=True)
+                    repo = Repo(str(pkg.path), search_parent_directories=True)
                 except Exception as e:
                     repo = None
                     print(f"\t- Warning: Could not open git repository for package {pkg.name}: {e}")
@@ -170,6 +167,8 @@ class BitbakeVerb(VerbExtensionPoint):
                 branch = None
                 src_rev = None
                 tag_name = None
+                repo_path = None
+
                 if repo is not None:
                     try:
                         # Use origin remote
@@ -213,7 +212,19 @@ class BitbakeVerb(VerbExtensionPoint):
                     # Get the current commit hash
                     src_rev = repo.head.commit.hexsha
 
-                    repo_name = repo.working_tree_dir.split("/")[-1]
+                    # get the path to the working copy
+                    repo_path = Path(repo.working_tree_dir).resolve()
+                    git_relpath = os.path.relpath(pkg.path, start=repo_path)
+
+                    if git_relpath == ".":
+                        git_relpath = ""
+                    else:
+                        git_relpath = "/" + git_relpath
+
+                    bitbake_recipe.set_pkg_path(str(git_relpath))
+                    lines.append(f"\t- Package repo path: {git_relpath}")
+
+                    repo_name = os.path.split(repo.working_tree_dir)[-1]
 
                     try:
                         tag_name = repo.git.describe('--tags', '--abbrev=0')
@@ -221,7 +232,6 @@ class BitbakeVerb(VerbExtensionPoint):
                         tag_name = None
 
                     bitbake_recipe.set_git_metadata(src_uri, branch, src_rev, repo_name, tag_name)
-
 
                 ros_bitbake_recipe = os.path.join(recipe_dir, bitbake_recipe.bitbake_recipe_filename())
                 lines.append(f"\t- Bitbake recipe: {ros_bitbake_recipe}")
